@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>櫻花蝦 操作面板</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Silkscreen&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #ff6b9d;
+      --pink-light: #ffb3cc;
+      --pink-dark: #cc3366;
+      --ocean: #0a1628;
+      --ocean-mid: #0d2140;
+      --ocean-light: #1a3a5c;
+      --teal: #00d4ff;
+      --bubble: rgba(255, 180, 210, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: var(--ocean);
+      color: #fff;
+      font-family: 'Noto Sans TC', sans-serif;
+      overflow-x: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* 海底背景 */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 80%, rgba(255, 107, 157, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 212, 255, 0.06) 0%, transparent 50%),
+        linear-gradient(180deg, #0a1628 0%, #0d2140 40%, #0a1e35 100%);
+      pointer-events: none;
+    }
+
+    /* 海草 */
+    .seaweed {
+      position: fixed;
+      bottom: 0;
+      width: 30px;
+      opacity: 0.3;
+    }
+    .seaweed svg { width: 100%; }
+    .sw1 { left: 5%; animation: sway 4s ease-in-out infinite; }
+    .sw2 { left: 15%; animation: sway 5s ease-in-out infinite reverse; height: 120px; }
+    .sw3 { right: 8%; animation: sway 3.5s ease-in-out infinite; }
+    .sw4 { right: 20%; animation: sway 6s ease-in-out infinite reverse; height: 90px; }
+
+    @keyframes sway {
+      0%, 100% { transform: rotate(-5deg); transform-origin: bottom; }
+      50% { transform: rotate(5deg); transform-origin: bottom; }
+    }
+
+    /* 氣泡 */
+    .bubble {
+      position: fixed;
+      border-radius: 50%;
+      background: var(--bubble);
+      border: 1px solid rgba(255, 180, 210, 0.2);
+      animation: rise linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes rise {
+      0% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 0.6; }
+      100% { transform: translateY(-100vh) translateX(var(--drift)); opacity: 0; }
+    }
+
+    /* 生成 20 個氣泡 */
+    .bubble:nth-child(1)  { width: 8px;  height: 8px;  left: 5%;   bottom: -10%; animation-duration: 8s;  animation-delay: 0s;    --drift: 20px; }
+    .bubble:nth-child(2)  { width: 14px; height: 14px; left: 12%;  bottom: -10%; animation-duration: 11s; animation-delay: 1s;    --drift: -15px; }
+    .bubble:nth-child(3)  { width: 6px;  height: 6px;  left: 20%;  bottom: -10%; animation-duration: 7s;  animation-delay: 2.5s;  --drift: 10px; }
+    .bubble:nth-child(4)  { width: 10px; height: 10px; left: 30%;  bottom: -10%; animation-duration: 9s;  animation-delay: 0.5s;  --drift: -20px; }
+    .bubble:nth-child(5)  { width: 18px; height: 18px; left: 40%;  bottom: -10%; animation-duration: 13s; animation-delay: 3s;    --drift: 25px; }
+    .bubble:nth-child(6)  { width: 7px;  height: 7px;  left: 50%;  bottom: -10%; animation-duration: 8s;  animation-delay: 1.5s;  --drift: -10px; }
+    .bubble:nth-child(7)  { width: 12px; height: 12px; left: 60%;  bottom: -10%; animation-duration: 10s; animation-delay: 4s;    --drift: 15px; }
+    .bubble:nth-child(8)  { width: 9px;  height: 9px;  left: 70%;  bottom: -10%; animation-duration: 7s;  animation-delay: 0.8s;  --drift: -18px; }
+    .bubble:nth-child(9)  { width: 16px; height: 16px; left: 80%;  bottom: -10%; animation-duration: 12s; animation-delay: 2s;    --drift: 12px; }
+    .bubble:nth-child(10) { width: 5px;  height: 5px;  left: 90%;  bottom: -10%; animation-duration: 6s;  animation-delay: 3.5s;  --drift: -8px; }
+    .bubble:nth-child(11) { width: 11px; height: 11px; left: 8%;   bottom: -10%; animation-duration: 9s;  animation-delay: 5s;    --drift: 20px; }
+    .bubble:nth-child(12) { width: 6px;  height: 6px;  left: 25%;  bottom: -10%; animation-duration: 8s;  animation-delay: 1.2s;  --drift: -12px; }
+    .bubble:nth-child(13) { width: 20px; height: 20px; left: 35%;  bottom: -10%; animation-duration: 14s; animation-delay: 2.8s;  --drift: 18px; }
+    .bubble:nth-child(14) { width: 8px;  height: 8px;  left: 45%;  bottom: -10%; animation-duration: 7s;  animation-delay: 0.3s;  --drift: -22px; }
+    .bubble:nth-child(15) { width: 13px; height: 13px; left: 55%;  bottom: -10%; animation-duration: 11s; animation-delay: 4.5s;  --drift: 10px; }
+    .bubble:nth-child(16) { width: 7px;  height: 7px;  left: 65%;  bottom: -10%; animation-duration: 8s;  animation-delay: 1.8s;  --drift: -14px; }
+    .bubble:nth-child(17) { width: 15px; height: 15px; left: 75%;  bottom: -10%; animation-duration: 12s; animation-delay: 3.2s;  --drift: 16px; }
+    .bubble:nth-child(18) { width: 9px;  height: 9px;  left: 85%;  bottom: -10%; animation-duration: 9s;  animation-delay: 0.6s;  --drift: -10px; }
+    .bubble:nth-child(19) { width: 4px;  height: 4px;  left: 92%;  bottom: -10%; animation-duration: 6s;  animation-delay: 2.2s;  --drift: 8px; }
+    .bubble:nth-child(20) { width: 17px; height: 17px; left: 3%;   bottom: -10%; animation-duration: 13s; animation-delay: 5.5s;  --drift: -20px; }
+
+    /* 主要內容 */
+    .container {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 40px 20px;
+      max-width: 480px;
+      width: 100%;
+    }
+
+    /* 蝦子頭貼 */
+    .avatar-wrapper {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 28px;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--pink);
+      box-shadow:
+        0 0 20px rgba(255, 107, 157, 0.4),
+        0 0 60px rgba(255, 107, 157, 0.15);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* 光環 */
+    .avatar-ring {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 107, 157, 0.3);
+      animation: pulse-ring 3s ease-in-out infinite;
+    }
+    .avatar-ring:nth-child(2) {
+      inset: -16px;
+      border-color: rgba(255, 107, 157, 0.15);
+      animation-delay: 0.5s;
+    }
+
+    @keyframes pulse-ring {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.6; }
+    }
+
+    /* 標題 */
+    .bot-name {
+      font-family: 'Silkscreen', monospace;
+      font-size: 1.1rem;
+      color: var(--pink-light);
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, var(--pink), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    /* 登入按鈕 */
+    .login-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+      color: #fff;
+      padding: 16px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+      box-shadow:
+        0 4px 20px rgba(255, 107, 157, 0.4),
+        0 0 0 1px rgba(255, 107, 157, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 8px 30px rgba(255, 107, 157, 0.5),
+        0 0 0 1px rgba(255, 107, 157, 0.4);
+    }
+
+    .login-btn:hover::before { opacity: 1; }
+
+    .login-btn svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* 版本標籤 */
+    .version {
+      margin-top: 32px;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.2);
+      font-family: 'Silkscreen', monospace;
+      letter-spacing: 2px;
+    }
+
+    /* 海底光線 */
+    .light-ray {
+      position: fixed;
+      top: -10%;
+      width: 2px;
+      height: 60%;
+      background: linear-gradient(180deg, rgba(255,180,210,0.08), transparent);
+      transform-origin: top center;
+      pointer-events: none;
+    }
+    .lr1 { left: 20%; transform: rotate(5deg); animation: ray 8s ease-in-out infinite; }
+    .lr2 { left: 40%; transform: rotate(-3deg); animation: ray 10s ease-in-out infinite reverse; width: 3px; }
+    .lr3 { left: 65%; transform: rotate(7deg); animation: ray 7s ease-in-out infinite; }
+    .lr4 { left: 80%; transform: rotate(-5deg); animation: ray 9s ease-in-out infinite reverse; }
+
+    @keyframes ray {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 氣泡 -->
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div>
+
+  <!-- 海草 -->
+  <div class="seaweed sw1">
+    <svg viewBox="0 0 30 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 150 Q5 120 15 100 Q25 80 15 60 Q5 40 15 20 Q25 0 15 0" stroke="#2d6a4f" stroke-width="4" fill="none"/>
+    </svg>
+  </div>
+  <div class="seaweed sw2">
+    <svg viewBox="0 0 30 120" fill="none">
+      <path d="M15 120 Q25 95 15 75 Q5 55 15 35 Q25 15 15 0" stroke="#40916c" stroke-width="4" fill="none"/>
+    </svg>
+  </div>
+  <div class="seaweed sw3">
+    <svg viewBox="0 0 30 150" fill="none">
+      <path d="M15 150 Q5 120 15 100 Q25 80 15 60 Q5 40 15 20 Q25 0 15 0" stroke="#2d6a4f" stroke-width="4" fill="none"/>
+    </svg>
+  </div>
+  <div class="seaweed sw4">
+    <svg viewBox="0 0 30 90" fill="none">
+      <path d="M15 90 Q25 70 15 50 Q5 30 15 10 Q20 0 15 0" stroke="#40916c" stroke-width="4" fill="none"/>
+    </svg>
+  </div>
+
+  <!-- 光線 -->
+  <div class="light-ray lr1"></div>
+  <div class="light-ray lr2"></div>
+  <div class="light-ray lr3"></div>
+  <div class="light-ray lr4"></div>
+
+  <div class="container">
+    <div class="avatar-wrapper">
+      <div class="avatar-ring"></div>
+      <div class="avatar-ring"></div>
+      <img class="avatar" src="https://cdn.discordapp.com/avatars/1513104546208157807/avatar.png" 
+           onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23ff6b9d%22/><text x=%2250%22 y=%2265%22 text-anchor=%22middle%22 font-size=%2250%22>🦐</text></svg>'"
+           alt="櫻花蝦">
+    </div>
+
+    <div class="bot-name">Sakura Shrimp</div>
+    <h1>櫻花蝦<br><span>操作面板</span></h1>
+    <p class="subtitle">登入後即可管理機器人在各伺服器的設定</p>
+
+    <a href="/api/login" class="login-btn">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+      </svg>
+      用 Discord 登入
+    </a>
+
+    <div class="version">v1.0 · ANTISCAM SYSTEM</div>
+  </div>
+</body>
+</html>

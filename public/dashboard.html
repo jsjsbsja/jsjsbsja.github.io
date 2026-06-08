@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>櫻花蝦 操作面板</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Silkscreen&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #ff6b9d;
+      --pink-light: #ffb3cc;
+      --pink-dark: #cc3366;
+      --ocean: #0a1628;
+      --ocean-mid: #0d2140;
+      --ocean-light: #1a3a5c;
+      --teal: #00d4ff;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,107,157,0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: var(--ocean);
+      color: #fff;
+      font-family: 'Noto Sans TC', sans-serif;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 80%, rgba(255,107,157,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0,212,255,0.04) 0%, transparent 50%),
+        linear-gradient(180deg, #0a1628 0%, #0d2140 60%, #0a1e35 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 氣泡 */
+    .bubble {
+      position: fixed;
+      border-radius: 50%;
+      background: rgba(255,180,210,0.1);
+      border: 1px solid rgba(255,180,210,0.15);
+      animation: rise linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes rise {
+      0% { transform: translateY(0); opacity: 0; }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.3; }
+      100% { transform: translateY(-100vh) translateX(var(--drift,0px)); opacity: 0; }
+    }
+    .bubble:nth-child(1)  { width:8px;  height:8px;  left:5%;   bottom:-5%; animation-duration:8s;  animation-delay:0s;   --drift:15px; }
+    .bubble:nth-child(2)  { width:12px; height:12px; left:15%;  bottom:-5%; animation-duration:11s; animation-delay:2s;   --drift:-10px; }
+    .bubble:nth-child(3)  { width:6px;  height:6px;  left:30%;  bottom:-5%; animation-duration:7s;  animation-delay:1s;   --drift:20px; }
+    .bubble:nth-child(4)  { width:10px; height:10px; left:50%;  bottom:-5%; animation-duration:9s;  animation-delay:3s;   --drift:-15px; }
+    .bubble:nth-child(5)  { width:15px; height:15px; left:65%;  bottom:-5%; animation-duration:12s; animation-delay:0.5s; --drift:10px; }
+    .bubble:nth-child(6)  { width:7px;  height:7px;  left:80%;  bottom:-5%; animation-duration:8s;  animation-delay:4s;   --drift:-20px; }
+    .bubble:nth-child(7)  { width:9px;  height:9px;  left:90%;  bottom:-5%; animation-duration:10s; animation-delay:1.5s; --drift:12px; }
+    .bubble:nth-child(8)  { width:5px;  height:5px;  left:40%;  bottom:-5%; animation-duration:6s;  animation-delay:2.5s; --drift:-8px; }
+    .bubble:nth-child(9)  { width:14px; height:14px; left:25%;  bottom:-5%; animation-duration:13s; animation-delay:5s;   --drift:18px; }
+    .bubble:nth-child(10) { width:8px;  height:8px;  left:75%;  bottom:-5%; animation-duration:9s;  animation-delay:0.8s; --drift:-12px; }
+
+    /* Nav */
+    nav {
+      position: relative;
+      z-index: 10;
+      background: rgba(10,22,40,0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 1rem;
+    }
+    .nav-logo img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1.5px solid var(--pink);
+    }
+    .nav-logo span {
+      font-family: 'Silkscreen', monospace;
+      font-size: 0.8rem;
+      color: var(--pink-light);
+      letter-spacing: 1px;
+    }
+    .nav-user { display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--pink); }
+    .username { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+    .logout-btn {
+      background: rgba(255,107,157,0.1);
+      border: 1px solid var(--border);
+      color: var(--pink-light);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { background: rgba(255,107,157,0.2); }
+
+    .main {
+      position: relative;
+      z-index: 5;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--pink-light);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* 伺服器卡片 */
+    .guilds { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+    .guild-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .guild-card:hover { border-color: var(--pink); background: rgba(255,107,157,0.06); transform: translateY(-2px); }
+    .guild-icon { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .guild-icon-placeholder {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1.1rem; flex-shrink: 0;
+    }
+    .guild-info { flex: 1; min-width: 0; }
+    .guild-name { font-weight: 700; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .guild-status {
+      font-size: 0.75rem; margin-top: 4px;
+      padding: 2px 8px; border-radius: 20px; display: inline-block;
+    }
+    .status-in { background: rgba(87,242,135,0.15); color: #57f287; }
+    .status-out { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.4); }
+    .invite-btn {
+      background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+      color: #fff; border: none;
+      padding: 6px 12px; border-radius: 20px;
+      cursor: pointer; font-size: 0.78rem; font-weight: 700;
+      white-space: nowrap; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .invite-btn:hover { transform: scale(1.05); }
+
+    /* 功能選擇 */
+    #feature-panel { display: none; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 20px;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: center;
+    }
+    .feature-card:hover { border-color: var(--pink); background: rgba(255,107,157,0.08); transform: translateY(-3px); }
+    .feature-icon { font-size: 2.2rem; margin-bottom: 12px; }
+    .feature-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
+    .feature-desc { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+
+    /* 設定面板 */
+    #config-panel { display: none; }
+    .back-btn {
+      background: none; border: none;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer; font-size: 0.9rem;
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 20px; padding: 0;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--pink-light); }
+    .config-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+    .config-title { font-size: 1.3rem; font-weight: 900; }
+    .config-subtitle { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .section-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 18px;
+    }
+    .section-label { font-size: 1rem; font-weight: 700; }
+    .toggle {
+      width: 46px; height: 24px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 12px; position: relative;
+      cursor: pointer; transition: background 0.2s; border: none; flex-shrink: 0;
+    }
+    .toggle.on { background: var(--pink); }
+    .toggle::after {
+      content: ''; position: absolute;
+      width: 18px; height: 18px; background: #fff;
+      border-radius: 50%; top: 3px; left: 3px;
+      transition: transform 0.2s;
+    }
+    .toggle.on::after { transform: translateX(22px); }
+
+    .field { margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { display: block; font-size: 0.82rem; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
+    .field input, .field select {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff; padding: 9px 12px;
+      border-radius: 8px; font-size: 0.9rem;
+      transition: border-color 0.2s;
+    }
+    .field input:focus, .field select:focus {
+      outline: none; border-color: var(--pink);
+    }
+    .field select option { background: #0d2140; }
+    .fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .save-btn {
+      background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+      color: #fff; border: none;
+      padding: 14px; border-radius: 12px;
+      font-size: 1rem; font-weight: 700;
+      cursor: pointer; width: 100%; margin-top: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(255,107,157,0.3);
+    }
+    .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(255,107,157,0.4); }
+    .save-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 20px;
+      background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+      color: #fff; padding: 12px 20px;
+      border-radius: 12px; font-weight: 700;
+      display: none; z-index: 100;
+      box-shadow: 0 4px 20px rgba(255,107,157,0.4);
+    }
+
+    /* 確認 modal */
+    #confirm-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 200;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-box {
+      background: var(--ocean-mid);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 32px 24px;
+      width: 300px; text-align: center;
+    }
+    .modal-icon { font-size: 40px; margin-bottom: 14px; }
+    .modal-title { font-weight: 900; font-size: 1.1rem; margin-bottom: 8px; }
+    .modal-desc { font-size: 0.85rem; color: rgba(255,255,255,0.4); margin-bottom: 24px; }
+    .modal-btns { display: flex; gap: 10px; }
+    .modal-cancel {
+      flex: 1; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff; padding: 12px; border-radius: 10px;
+      cursor: pointer; font-size: 0.9rem;
+    }
+    .modal-confirm {
+      flex: 1;
+      background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+      border: none; color: #fff; padding: 12px;
+      border-radius: 10px; cursor: pointer;
+      font-size: 0.9rem; font-weight: 700;
+    }
+
+    .loading { text-align: center; padding: 60px; color: rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <!-- 氣泡 -->
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div>
+
+  <nav>
+    <div class="nav-logo">
+      <img src="https://cdn.discordapp.com/avatars/1513104546208157807/avatar.png"
+           onerror="this.style.display='none'" alt="櫻花蝦">
+      <span>SAKURA SHRIMP</span>
+    </div>
+    <div class="nav-user">
+      <img id="nav-avatar" class="avatar" src="" alt="" style="display:none">
+      <span id="nav-username" class="username"></span>
+      <button class="logout-btn" onclick="location.href='/api/logout'">登出</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <!-- 伺服器列表 -->
+    <div id="guilds-panel">
+      <div class="section-title">🦐 選擇伺服器</div>
+      <div id="guilds" class="guilds"><div class="loading">載入中...</div></div>
+    </div>
+
+    <!-- 功能選擇 -->
+    <div id="feature-panel">
+      <button class="back-btn" onclick="showGuilds()">← 返回伺服器列表</button>
+      <div class="config-header">
+        <img id="feature-guild-icon" style="width:44px;height:44px;border-radius:50%;display:none;border:2px solid var(--pink)">
+        <div id="feature-guild-placeholder" class="guild-icon-placeholder" style="display:none"></div>
+        <div>
+          <div class="config-title" id="feature-guild-name"></div>
+          <div class="config-subtitle">請選擇要管理的功能</div>
+        </div>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card" onclick="openConfig('antiscam')">
+          <div class="feature-icon">🛡️</div>
+          <div class="feature-name">防詐群系統</div>
+          <div class="feature-desc">Bot偵測・刷頻禁言・Webhook防護</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 設定面板 -->
+    <div id="config-panel">
+      <button class="back-btn" onclick="checkUnsavedAndBack()">← 返回功能選擇</button>
+      <div class="config-header">
+        <img id="config-guild-icon" style="width:44px;height:44px;border-radius:50%;display:none;border:2px solid var(--pink)">
+        <div id="config-guild-placeholder" class="guild-icon-placeholder" style="display:none"></div>
+        <div>
+          <div class="config-title" id="config-guild-name"></div>
+          <div class="config-subtitle">🛡️ 防詐群系統設定</div>
+        </div>
+      </div>
+
+      <div class="section" id="master-section">
+        <div class="section-header">
+          <div class="section-label">🛡️ 防詐群總開關</div>
+          <button class="toggle" id="toggle-enabled" onclick="toggleField('enabled')"></button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <div class="section-label">🤖 外部應用程式洪水偵測</div>
+          <button class="toggle" id="toggle-bot_flood_enabled" onclick="toggleField('bot_flood_enabled')"></button>
+        </div>
+        <div class="fields-row">
+          <div class="field"><label>時間窗口（秒）</label><input type="number" id="bot_flood_seconds" min="1" max="60"></div>
+          <div class="field"><label>訊息數上限</label><input type="number" id="bot_flood_threshold" min="2" max="100"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <div class="section-label">🔇 刷頻自動禁言</div>
+          <button class="toggle" id="toggle-spam_mute_enabled" onclick="toggleField('spam_mute_enabled')"></button>
+        </div>
+        <div class="fields-row">
+          <div class="field"><label>時間窗口（秒）</label><input type="number" id="spam_seconds" min="1" max="60"></div>
+          <div class="field"><label>訊息數上限</label><input type="number" id="spam_threshold" min="2" max="50"></div>
+        </div>
+        <div class="field"><label>禁言時間（分鐘）</label><input type="number" id="mute_duration" min="1" max="10080"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <div class="section-label">🔗 Webhook 洪水偵測</div>
+          <button class="toggle" id="toggle-webhook_flood_enabled" onclick="toggleField('webhook_flood_enabled')"></button>
+        </div>
+        <div class="fields-row">
+          <div class="field"><label>時間窗口（秒）</label><input type="number" id="webhook_flood_seconds" min="1" max="30"></div>
+          <div class="field"><label>訊息數上限</label><input type="number" id="webhook_flood_threshold" min="2" max="50"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <div class="section-label">📢 Webhook @everyone 偵測</div>
+          <button class="toggle" id="toggle-webhook_mention_enabled" onclick="toggleField('webhook_mention_enabled')"></button>
+        </div>
+        <div class="fields-row">
+          <div class="field"><label>時間窗口（秒）</label><input type="number" id="webhook_mention_seconds" min="1" max="60"></div>
+          <div class="field"><label>訊息數上限</label><input type="number" id="webhook_mention_threshold" min="1" max="20"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <div class="section-label">📢 外部應用程式 @everyone 偵測</div>
+          <button class="toggle" id="toggle-bot_mention_enabled" onclick="toggleField('bot_mention_enabled')"></button>
+        </div>
+        <div class="fields-row">
+          <div class="field"><label>時間窗口（秒）</label><input type="number" id="bot_mention_seconds" min="1" max="60"></div>
+          <div class="field"><label>訊息數上限</label><input type="number" id="bot_mention_threshold" min="1" max="20"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label" style="margin-bottom:18px">📋 頻道設定</div>
+        <div class="field">
+          <label>擁有者通知頻道（不設定則私訊擁有者）</label>
+          <select id="owner_notify_channel"><option value="">❌ 未設定（私訊擁有者）</option></select>
+        </div>
+        <div class="field">
+          <label>違規處理訊息頻道</label>
+          <select id="alert_channel"><option value="">❌ 未設定（發在事發頻道）</option></select>
+        </div>
+        <div class="field">
+          <label>違規訊息自動刪除（秒，0=不刪除）</label>
+          <input type="number" id="alert_delete_after" min="0" max="600">
+        </div>
+      </div>
+
+      <button class="save-btn" onclick="saveConfig()">💾 儲存設定</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">✅ 設定已儲存！</div>
+
+  <div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+    <div class="modal-box">
+      <div class="modal-icon">💾</div>
+      <div class="modal-title">確認儲存設定？</div>
+      <div class="modal-desc">新設定將立即覆蓋目前的設定</div>
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="cancelSave()">取消</button>
+        <button class="modal-confirm" onclick="confirmSave()">確認儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 未儲存變更警告 -->
+  <div id="unsaved-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+    <div class="modal-box">
+      <div class="modal-icon">⚠️</div>
+      <div class="modal-title">有未儲存的變更</div>
+      <div class="modal-desc">你有尚未儲存的設定，確定要離開嗎？</div>
+      <div class="modal-btns">
+        <button class="modal-cancel" style="background:rgba(255,59,59,0.2);border-color:rgba(255,59,59,0.4);color:#ff6b6b" onclick="leaveWithoutSave()">不儲存</button>
+        <button class="modal-confirm" style="background:linear-gradient(135deg,#1a7a4a,#2ecc71)" onclick="saveAndLeave()">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentGuildId = null;
+    let currentGuildName = '';
+    let currentGuildIcon = '';
+    let config = {};
+
+    fetch('/api/me').then(r => r.json()).then(user => {
+      if (user.error) return location.href = '/';
+      document.getElementById('nav-username').textContent = user.username;
+      if (user.avatar) {
+        const img = document.getElementById('nav-avatar');
+        img.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+        img.style.display = 'block';
+      }
+    }).catch(() => location.href = '/');
+
+    fetch('/api/guilds').then(r => r.json()).then(guilds => {
+      const container = document.getElementById('guilds');
+      container.innerHTML = '';
+      guilds.forEach(guild => {
+        const card = document.createElement('div');
+        card.className = 'guild-card';
+        const iconHtml = guild.icon
+          ? `<img class="guild-icon" src="https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png" alt="">`
+          : `<div class="guild-icon-placeholder">${guild.name[0]}</div>`;
+        const statusClass = guild.botIn ? 'status-in' : 'status-out';
+        const statusText = guild.botIn ? '✅ Bot 已在' : '➕ 尚未邀請';
+        card.innerHTML = `
+          ${iconHtml}
+          <div class="guild-info">
+            <div class="guild-name">${guild.name}</div>
+            <span class="guild-status ${statusClass}">${statusText}</span>
+          </div>
+          ${guild.botIn
+            ? `<button class="invite-btn" onclick="openFeatures('${guild.id}','${guild.name.replace(/'/g,"\\'")}','${guild.icon||''}');event.stopPropagation()">管理</button>`
+            : `<button class="invite-btn" onclick="inviteBot('${guild.id}');event.stopPropagation()">邀請</button>`
+          }
+        `;
+        if (guild.botIn) card.onclick = () => openFeatures(guild.id, guild.name, guild.icon || '');
+        container.appendChild(card);
+      });
+    });
+
+    function inviteBot(guildId) {
+      fetch(`/api/invite/${guildId}`).then(r => r.json()).then(d => window.open(d.url, '_blank'));
+    }
+
+    function openFeatures(guildId, guildName, guildIcon) {
+      currentGuildId = guildId;
+      currentGuildName = guildName;
+      currentGuildIcon = guildIcon;
+
+      document.getElementById('feature-guild-name').textContent = guildName;
+      setGuildIcon('feature', guildId, guildName, guildIcon);
+
+      document.getElementById('guilds-panel').style.display = 'none';
+      document.getElementById('feature-panel').style.display = 'block';
+      document.getElementById('config-panel').style.display = 'none';
+    }
+
+    function openConfig(feature) {
+      if (feature !== 'antiscam') return;
+      document.getElementById('config-guild-name').textContent = currentGuildName;
+      setGuildIcon('config', currentGuildId, currentGuildName, currentGuildIcon);
+
+      document.getElementById('feature-panel').style.display = 'none';
+      document.getElementById('config-panel').style.display = 'block';
+
+      fetch(`/api/guild/${currentGuildId}/config`).then(r => r.json()).then(cfg => {
+        config = cfg;
+        applyConfig(cfg);
+        hasChanges = false;
+        // 監聽所有 input/select 變動
+        document.querySelectorAll('#config-panel input, #config-panel select').forEach(el => {
+          el.addEventListener('change', markChanged);
+          el.addEventListener('input', markChanged);
+        });
+      });
+      fetch(`/api/guild/${currentGuildId}/channels`).then(r => r.json()).then(channels => {
+        populateChannels(channels, config);
+      });
+    }
+
+    function setGuildIcon(prefix, guildId, guildName, guildIcon) {
+      const img = document.getElementById(`${prefix}-guild-icon`);
+      const ph = document.getElementById(`${prefix}-guild-placeholder`);
+      if (guildIcon) {
+        img.src = `https://cdn.discordapp.com/icons/${guildId}/${guildIcon}.png`;
+        img.style.display = 'block';
+        ph.style.display = 'none';
+      } else {
+        ph.textContent = guildName[0];
+        ph.style.display = 'flex';
+        img.style.display = 'none';
+      }
+    }
+
+    function applyConfig(cfg) {
+      hasChanges = false;
+      // 給所有 input 加監聽
+      setTimeout(updateMasterSwitch, 0);
+      ['enabled','bot_flood_enabled','spam_mute_enabled','webhook_flood_enabled','webhook_mention_enabled','bot_mention_enabled'].forEach(key => {
+        const el = document.getElementById(`toggle-${key}`);
+        if (el) el.classList.toggle('on', cfg[key]);
+      });
+      ['bot_flood_seconds','bot_flood_threshold','spam_seconds','spam_threshold','mute_duration',
+       'webhook_flood_seconds','webhook_flood_threshold','webhook_mention_seconds','webhook_mention_threshold',
+       'bot_mention_seconds','bot_mention_threshold','alert_delete_after'].forEach(key => {
+        const el = document.getElementById(key);
+        if (el) el.value = cfg[key] ?? '';
+      });
+    }
+
+    function populateChannels(channels, cfg) {
+      ['owner_notify_channel','alert_channel'].forEach(key => {
+        const sel = document.getElementById(key);
+        const cur = cfg[key];
+        sel.innerHTML = key === 'owner_notify_channel'
+          ? '<option value="">❌ 未設定（私訊擁有者）</option>'
+          : '<option value="">❌ 未設定（發在事發頻道）</option>';
+        channels.forEach(ch => {
+          const opt = document.createElement('option');
+          opt.value = ch.id;
+          opt.textContent = `#${ch.name}`;
+          if (ch.id === String(cur)) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    function toggleField(key) {
+      config[key] = !config[key];
+      const el = document.getElementById(`toggle-${key}`);
+      if (el) el.classList.toggle('on', config[key]);
+      if (key === 'enabled') updateMasterSwitch();
+      markChanged();
+    }
+
+    function updateMasterSwitch() {
+      const enabled = config['enabled'];
+      // 只鎖總開關以外的區塊
+      const allSections = document.querySelectorAll('#config-panel .section');
+      allSections.forEach(section => {
+        if (section.id === 'master-section') return; // 總開關本身不鎖
+        section.style.opacity = enabled ? '1' : '0.4';
+        section.style.pointerEvents = enabled ? 'auto' : 'none';
+      });
+    }
+
+    function saveConfig() {
+      document.getElementById('confirm-modal').style.display = 'flex';
+    }
+
+    async function confirmSave() {
+      document.getElementById('confirm-modal').style.display = 'none';
+      const btn = document.querySelector('.save-btn');
+      btn.disabled = true; btn.textContent = '儲存中...';
+
+      ['bot_flood_seconds','bot_flood_threshold','spam_seconds','spam_threshold','mute_duration',
+       'webhook_flood_seconds','webhook_flood_threshold','webhook_mention_seconds','webhook_mention_threshold',
+       'bot_mention_seconds','bot_mention_threshold','alert_delete_after'].forEach(key => {
+        const el = document.getElementById(key);
+        if (el) config[key] = parseInt(el.value) || 0;
+      });
+      ['owner_notify_channel','alert_channel'].forEach(key => {
+        const el = document.getElementById(key);
+        if (el) config[key] = el.value || null;
+      });
+
+      await fetch(`/api/guild/${currentGuildId}/config`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(config)
+      });
+
+      btn.disabled = false; btn.textContent = '💾 儲存設定';
+      hasChanges = false;
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    function cancelSave() {
+      document.getElementById('confirm-modal').style.display = 'none';
+    }
+
+    // 追蹤是否有未儲存變更
+    let originalConfig = {};
+    let hasChanges = false;
+
+    function markChanged() {
+      hasChanges = true;
+    }
+
+    function checkUnsavedAndBack() {
+      if (hasChanges) {
+        document.getElementById('unsaved-modal').style.display = 'flex';
+      } else {
+        showFeatures();
+      }
+    }
+
+    function leaveWithoutSave() {
+      document.getElementById('unsaved-modal').style.display = 'none';
+      hasChanges = false;
+      showFeatures();
+    }
+
+    async function saveAndLeave() {
+      document.getElementById('unsaved-modal').style.display = 'none';
+      await confirmSave();
+      hasChanges = false;
+      showFeatures();
+    }
+
+    function showGuilds() {
+      document.getElementById('guilds-panel').style.display = 'block';
+      document.getElementById('feature-panel').style.display = 'none';
+      document.getElementById('config-panel').style.display = 'none';
+    }
+
+    function showFeatures() {
+      document.getElementById('feature-panel').style.display = 'block';
+      document.getElementById('config-panel').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
