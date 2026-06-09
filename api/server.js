@@ -14,7 +14,7 @@ const supabase = createClient(
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
-const BASE_URL = 'https://sakurashrimp.dpdns.org';
+const BASE_URL = 'https://panel.sakurashrimp.dpdns.org';
 const REDIRECT_URI = `${BASE_URL}/api/callback`;
 
 app.use(express.json());
